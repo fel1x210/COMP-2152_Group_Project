@@ -16,7 +16,7 @@ print("==================================================================")
 
 # Print operating system information
 print("------------------------------------------------------------------")
-print(f"Game running on operating system: {os.name}")
+print(f"Game running on Operating System: {os.name}")
 if os.name == 'nt':
     print("This is a Windows system")
 elif os.name == 'posix':
