@@ -30,8 +30,9 @@ else:
 small_dice_options = list(range(1, 7))
 big_dice_options = list(range(1, 21))
 
-# Define the Weapons
+# Define the Weapons and Spells
 weapons = ["Fist", "Knife", "Club", "Gun", "Bomb", "Nuclear Bomb"]
+spells = ["Fire", "Ice", "Lightning", "Earth", "Water"]
 
 # Define the Loot
 loot_options = ["Health Potion", "Poison Potion", "Secret Note", "Leather Boots", "Flimsy Gloves"]
@@ -115,6 +116,10 @@ if not input_invalid:
     monster = generate_monster_types()
     monster.combat_strength = monster_strength
     
+    # Set random spell weakness and resistance for the monster
+    monster.spell_weakness = random.choice(spells)
+    monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
+    
     # Lab 06 - Question 5b
     functions.adjust_combat_strength(hero, monster)
 
@@ -143,6 +148,11 @@ if not input_invalid:
     print_game_text("Roll the dice for the monster's health points (Press enter)")
     input("    > ")
     print_important(f"Monster rolled {monster.health_points} health points")
+    
+    # Show monster's spell weaknesses and resistances
+    print_section("Monster Spell Properties")
+    print_important(f"Monster is WEAK against {monster.spell_weakness} spells")
+    print_important(f"Monster is RESISTANT to {monster.spell_resistance} spells")
 
     # Collect Loot
     print_section("Treasure Hunt")
@@ -208,6 +218,12 @@ if not input_invalid:
     # Regenerate the monster based on the environment
     monster = generate_monster_types(environment=combat_environment)
     monster.combat_strength = monster_strength + min(6, monster_powers[power_roll])  # Apply original monster strength + power
+    
+    # Set random spell weakness and resistance for the new monster
+    monster.spell_weakness = random.choice(spells)
+    monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
+    print_important(f"Monster is WEAK against {monster.spell_weakness} spells")
+    print_important(f"Monster is RESISTANT to {monster.spell_resistance} spells")
     
     # Display monster type information
     if hasattr(monster, 'monster_type'):

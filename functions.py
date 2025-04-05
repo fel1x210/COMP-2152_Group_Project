@@ -24,6 +24,8 @@ def print_important(text):
 
 # Will the line below print when you import function.py into main.py?
 # print("Inside function.py")
+spells = ["Fire", "Ice", "Lightning", "Earth", "Water", "None"]
+
 
 
 def use_loot(belt, hero):
@@ -93,6 +95,22 @@ def hero_attacks(hero, monster):
   """
     print("\n" + ascii_image)
     
+    # Roll for spell cast
+    print_section("Hero Attack")
+    spell_roll = random.choice(spells)
+    if spell_roll == "None":
+        print_game_text("The hero used a normal attack.")
+    else:
+        print_important(f"Hero casted a {spell_roll} spell!")
+    
+    # Check if spell casted is strong or weak against monster
+    spell_dmg_amp = False
+    spell_dmg_damp = False
+    
+    if hasattr(monster, 'spell_weakness') and hasattr(monster, 'spell_resistance'):
+        spell_dmg_amp = (spell_roll == monster.spell_weakness)
+        spell_dmg_damp = (spell_roll == monster.spell_resistance)
+    
     # Get the current weapon based on combat strength
     weapons = ["Fist", "Knife", "Club", "Gun", "Bomb", "Nuclear Bomb"]
     current_weapon = weapons[min(5, hero.combat_strength - 1)]
@@ -102,12 +120,21 @@ def hero_attacks(hero, monster):
     if hasattr(monster, 'calculate_damage_modifier'):
         damage_modifier = monster.calculate_damage_modifier(current_weapon)
     
-    # Calculate actual damage based on hero's combat strength and type modifiers
-    actual_damage = int(hero.combat_strength * damage_modifier)
+    # Apply spell effects to hero's combat strength
+    combat_strength = hero.combat_strength
+    if spell_dmg_amp:
+        combat_strength += combat_strength/2
+        print_important("Spell casted is effective against monster! Damage amplified by 50%!")
+    elif spell_dmg_damp:
+        combat_strength -= combat_strength/2
+        print_important("Spell casted is not effective against monster! Damage reduced by 50%!")
+    else:
+        print_game_text("No damage change from spell effects.")
     
-    # Display type information if applicable
-    print_section("Hero Attack")
-    print_game_text(f"Player's weapon {current_weapon} ({hero.combat_strength}) ---> Monster ({monster.health_points})")
+    # Calculate actual damage based on hero's combat strength, type modifiers, and spell effects
+    actual_damage = int(combat_strength * damage_modifier)
+    
+    print_game_text(f"Player's weapon {current_weapon} ({actual_damage} damage) ---> Monster ({monster.health_points} HP)")
     
     # Check for monster's ability to dodge/reduce damage with special ability
     ability_effect = 0
