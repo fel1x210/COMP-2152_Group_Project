@@ -1,8 +1,11 @@
 # Import the random library to use for the dice later
 import random
 
+
 # Will the line below print when you import function.py into main.py?
 # print("Inside function.py")
+spells = ["Fire", "Ice", "Lightning", "Earth", "Water", "None"]
+
 
 
 def use_loot(belt, hero):
@@ -69,8 +72,25 @@ def hero_attacks(hero, monster):
 
   """
     print(ascii_image)
-    print(f"    |    Player's weapon ({hero.combat_strength}) ---> Monster ({monster.health_points})")
-    if hero.combat_strength >= monster.health_points:
+    spell_roll = random.choice(spells)
+    if spell_roll == "None":
+        print("The hero used a normal attack.")
+    else:
+        print(f"Hero casted a {spell_roll} spell!")
+    # Check if spell casted is strong or weak against monster
+    spell_dmg_amp = (spell_roll == monster.spell_weakness)
+    spell_dmg_damp = (spell_roll == monster.spell_resistance)
+    combat_strength = hero.combat_strength
+    if spell_dmg_amp:
+        combat_strength += combat_strength/2
+        print("Spell casted is effective against monster! Damage amplified by 50%!")
+    elif spell_dmg_damp:
+        combat_strength -= combat_strength/2
+        print("Spell casted is not effective against monster! Damage reduced by 50%!")
+    else:
+        print("No damage change.")
+    print(f"    |    Player's weapon ({combat_strength}) ---> Monster ({monster.health_points})")
+    if (hero.combat_strength >= monster.health_points) or ():
         # Player was strong enough to kill monster in one blow
         monster.health_points = 0
         print("    |    You have killed the monster")

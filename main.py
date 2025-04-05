@@ -29,8 +29,10 @@ print("------------------------------------------------------------------")
 small_dice_options = list(range(1, 7))
 big_dice_options = list(range(1, 21))
 
-# Define the Weapons
+# Define the Weapons and Spells
 weapons = ["Fist", "Knife", "Club", "Gun", "Bomb", "Nuclear Bomb"]
+spells = ["Fire", "Ice", "Lightning", "Earth", "Water"]
+
 
 # Define the Loot
 loot_options = ["Health Potion", "Poison Potion", "Secret Note", "Leather Boots", "Flimsy Gloves"]
