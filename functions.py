@@ -76,7 +76,7 @@ def collect_loot(loot_options, belt):
 
 
 # Hero's Attack Function
-def hero_attacks(hero, monster, belt):
+def hero_attacks(hero, monster, belt=[]):
     ascii_image = """
                                 @@   @@ 
                                 @    @  
@@ -107,6 +107,7 @@ def hero_attacks(hero, monster, belt):
     else:
         print_important(f"Hero casted a {spell_roll} spell!")
 
+    # FEATURE: Monster Type System - Spell interaction
     # Check if spell casted is strong or weak against monster
     spell_dmg_amp = False
     spell_dmg_damp = False
@@ -119,6 +120,7 @@ def hero_attacks(hero, monster, belt):
     weapons = ["Fist", "Knife", "Club", "Gun", "Bomb", "Nuclear Bomb"]
     current_weapon = weapons[min(5, hero.combat_strength - 1)]
 
+    # FEATURE: Monster Type System - Weapon type effectiveness
     # Check if the monster has type-based damage modifiers
     damage_modifier = 1.0
     if hasattr(monster, 'calculate_damage_modifier'):
@@ -136,7 +138,7 @@ def hero_attacks(hero, monster, belt):
         print_game_text("No damage change from spell effects.")
 
     # crit if health is less than 10 and you have a health potion
-    if hero.health_points <= 10 and "Health Potion" in belt:
+    if hero.health_points <= 10 and belt and "Health Potion" in belt:
         print("    |    Critical Hit! You deal double damage!")
         combat_strength = combat_strength * 2
     else:
@@ -148,6 +150,7 @@ def hero_attacks(hero, monster, belt):
     print_game_text(
         f"Player's weapon {current_weapon} ({actual_damage} damage) ---> Monster ({monster.health_points} HP)")
 
+    # FEATURE: Monster Type System - Special abilities
     # Check for monster's ability to dodge/reduce damage with special ability
     ability_effect = 0
     if hasattr(monster, 'special_ability'):
@@ -172,6 +175,7 @@ def hero_attacks(hero, monster, belt):
             print_important(
                 f"{current_weapon} is WEAK against {monster.monster_type}! Damage reduced to {actual_damage}!")
 
+    # FEATURE: Monster Type System - Adaptation
     # Check if monster adapts to the attack
     if hasattr(monster, 'adapt_to_attack'):
         monster.adapt_to_attack(current_weapon)
@@ -186,6 +190,7 @@ def hero_attacks(hero, monster, belt):
         monster.health_points -= actual_damage
         print_game_text(f"You have reduced the monster's health to: {monster.health_points}")
 
+        # FEATURE: Monster Type System - Mythical rebirth ability
         # Check for Phoenix rebirth ability
         if hasattr(monster, 'mythical_type') and monster.mythical_type == "Phoenix":
             if monster.health_points < 5 and "rebirth_chance" in monster.secondary_attributes:
