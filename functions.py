@@ -311,4 +311,19 @@ def select_environment():
     
     return selected_environment
 
-
+def print_grid(hx, hy, rows, cols, town_positions):
+    for j in range(cols+1):
+        print(j, end=' ')
+    print()
+    for i in range(rows):
+        print(i+1, end=' ')
+        for j in range(cols):
+            if (i, j) == (hx, hy) and (i, j) in town_positions:
+                print('HT', end=' ')    # Hero location in map while at Town
+            elif (i, j) == (hx, hy):
+                print('H', end=' ')     # Hero location in map
+            elif (i, j) in town_positions:
+                print('T', end=' ')     # Town location
+            else:
+                print('~', end=' ')     # map fields
+        print()

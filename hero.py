@@ -8,6 +8,7 @@ class Hero(Character):
             combat_strength=random.choice(range(1, 7)),
             health_points=random.choice(range(1, 21))
         )
+        self.__randomEncounter = -1
 
     def __del__(self):
         # First print Hero-specific message
@@ -24,3 +25,11 @@ class Hero(Character):
             m_health_points -= self.combat_strength
             print("    |    You have reduced the monster's health to: " + str(m_health_points))
         return m_health_points
+    
+    @property
+    def randEnc(self):
+        return self.__randomEncounter
+
+    @randEnc.setter
+    def randEnc(self, value):
+        self.__randomEncounter = value
