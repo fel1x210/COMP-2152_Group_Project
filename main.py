@@ -174,6 +174,16 @@ if not input_invalid:
             monster = generate_monster_types()
             monster.combat_strength = monster_strength
 
+            # Display monster type immediately after generation
+            if hasattr(monster, 'monster_type'):
+                print_header("MONSTER ENCOUNTER")
+                print_important(f"A {monster.monster_type} appears before you!")
+                print_game_text(f"{monster.get_description()}")
+                # Display environment information if the monster has it
+                if hasattr(monster, 'environments') and monster.environments:
+                    print_important(f"This monster thrives in: {', '.join(monster.environments)}")
+                    print_game_text("Be careful if you encounter it in those areas!")
+
             # Set random spell weakness and resistance for the monster
             monster.spell_weakness = random.choice(spells)
             monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
@@ -264,6 +274,17 @@ if not input_invalid:
             monster = generate_monster_types(environment=combat_environment)
             monster.combat_strength = monster_strength + min(6, monster_powers[power_roll])  # Apply original monster strength + power
 
+            # Display the new monster with emphasis on the environment connection
+            if hasattr(monster, 'monster_type'):
+                print_header("NEW MONSTER APPEARS")
+                if combat_environment in monster.environments:
+                    print_important(f"A {monster.monster_type} appears in the {combat_environment} environment - ITS NATURAL HABITAT!")
+                    print_game_text("This monster will be stronger here!")
+                else:
+                    print_important(f"A {monster.monster_type} appears in the {combat_environment} environment!")
+                    print_game_text(f"This is not its natural habitat. It prefers: {', '.join(monster.environments)}")
+                print_game_text(f"{monster.get_description()}")
+
             # Set random spell weakness and resistance for the new monster
             monster.spell_weakness = random.choice(spells)
             monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
@@ -272,9 +293,6 @@ if not input_invalid:
 
             # Display monster type information
             if hasattr(monster, 'monster_type'):
-                print_important(f"A {monster.monster_type} appears before you!")
-                print_game_text(f"{monster.get_description()}")
-
                 # Show weapon effectiveness using list comprehension with nested conditionals
                 print_section("Weapon Effectiveness")
                 weapon_effectiveness = [
