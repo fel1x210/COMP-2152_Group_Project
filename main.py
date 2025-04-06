@@ -340,7 +340,7 @@ if not input_invalid:
                     if weapon_usage[current_weapon] > 1 and hasattr(monster, 'adaptive') and monster.adaptive:
                         print_important(f"The {monster.monster_type} seems to be studying your {current_weapon} attacks...")
 
-                    functions.hero_attacks(hero, monster)
+                    functions.hero_attacks(hero, monster,belt)
                     if monster.health_points == 0:
                         num_stars = 3
                     else:
@@ -371,7 +371,7 @@ if not input_invalid:
                         if weapon_usage[current_weapon] > 1 and hasattr(monster, 'adaptive') and monster.adaptive:
                             print_important(f"The {monster.monster_type} seems to be studying your {current_weapon} attacks...")
 
-                        functions.hero_attacks(hero, monster)
+                        functions.hero_attacks(hero, monster,belt)
                         if monster.health_points == 0:
                             num_stars = 3
 
