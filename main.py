@@ -123,9 +123,14 @@ if not input_invalid:
     # locations of towns in the map
     town_positions = {(2, 2), (7, 8), (3, 6), (7, 0), (6, 5)}
 
-
     # Game loop
     while True:
+        # Check if player is dead
+        if hero.health_points <= 0:
+            print_important("You have been defeated! Game Over!")
+            functions.save_game("Monster")
+            break
+            
         print_grid(hero_x, hero_y, map_rows, map_cols, town_positions)
 
         move = input("Move (W/A/S/D, Q to quit): ").lower()
@@ -160,10 +165,24 @@ if not input_invalid:
             pass
         elif hero.randEnc > 15:
             # Random encounter 35% chance to find a monster while roaming the map
+            # FEATURE DEMONSTRATION: MONSTER TYPE SYSTEM
+            print_header("MONSTER TYPE SYSTEM FEATURE")
+            print_important("Creating a monster with the Monster Type System...")
+            
             # Use dynamic monster type system instead of basic Monster
             # Generate a monster using list comprehension (in monster_types module)
             monster = generate_monster_types()
             monster.combat_strength = monster_strength
+
+            # Display monster type immediately after generation
+            if hasattr(monster, 'monster_type'):
+                print_header("MONSTER ENCOUNTER")
+                print_important(f"A {monster.monster_type} appears before you!")
+                print_game_text(f"{monster.get_description()}")
+                # Display environment information if the monster has it
+                if hasattr(monster, 'environments') and monster.environments:
+                    print_important(f"This monster thrives in: {', '.join(monster.environments)}")
+                    print_game_text("Be careful if you encounter it in those areas!")
 
             # Set random spell weakness and resistance for the monster
             monster.spell_weakness = random.choice(spells)
@@ -245,35 +264,49 @@ if not input_invalid:
             monster.combat_strength += min(6, monster_powers[power_roll])
             print_important(f"The monster's combat strength is now {monster.combat_strength} using the {power_roll} magic power")
 
+            # FEATURE DEMONSTRATION: ENVIRONMENT SYSTEM
+            print_header("ENVIRONMENT INTERACTION FEATURE")
+            
             # Select a random environment for the battle
             combat_environment = functions.select_environment()
-
-            # Regenerate the monster based on the environment
-            monster = generate_monster_types(environment=combat_environment)
-            monster.combat_strength = monster_strength + min(6, monster_powers[power_roll])  # Apply original monster strength + power
-
-            # Set random spell weakness and resistance for the new monster
-            monster.spell_weakness = random.choice(spells)
-            monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
+            
+            # Instead of generating a new monster, apply environment effects to the existing monster
+            print_header("ENVIRONMENT EFFECT ON MONSTER")
+            
+            # Check if the environment affects the monster
+            if hasattr(monster, 'environments') and combat_environment in monster.environments:
+                environment_bonus = monster.environment_bonus(combat_environment)
+                monster.combat_strength += environment_bonus
+                print_important(f"The {monster.monster_type} is in its natural habitat: {combat_environment}!")
+                print_game_text(f"It gains {environment_bonus} additional combat strength!")
+                print_important(f"Combat strength increased to {monster.combat_strength}!")
+            else:
+                print_important(f"The {monster.monster_type} is now in a {combat_environment} environment.")
+                if hasattr(monster, 'environments') and monster.environments:
+                    print_game_text(f"This is not its natural habitat. It prefers: {', '.join(monster.environments)}")
+                else:
+                    print_game_text("This monster has no environment preferences.")
+            
+            # Still show monster information for clarity
+            print_game_text(f"{monster.get_description()}")
+            
+            # Show monster's spell weaknesses and resistances again
+            print_section("Monster Spell Properties")
             print_important(f"Monster is WEAK against {monster.spell_weakness} spells")
             print_important(f"Monster is RESISTANT to {monster.spell_resistance} spells")
-
-            # Display monster type information
+            
+            # Show weapon effectiveness using list comprehension with nested conditionals
             if hasattr(monster, 'monster_type'):
-                print_important(f"A {monster.monster_type} appears before you!")
-                print_game_text(f"{monster.get_description()}")
-
-                # Show weapon effectiveness using list comprehension with nested conditionals
                 print_section("Weapon Effectiveness")
                 weapon_effectiveness = [
-                    f"{weapon} is " +
-                    ("EFFECTIVE against" if weapon in monster.weaknesses else
-                    "WEAK against" if weapon in monster.strengths else
-                    "NEUTRAL against") +
+                    f"{weapon} is " + 
+                    ("EFFECTIVE against" if weapon in monster.weaknesses else 
+                     "WEAK against" if weapon in monster.strengths else 
+                     "NEUTRAL against") + 
                     f" this monster!"
                     for weapon in weapons
                 ]
-
+                
                 # Print the effectiveness information for the player's weapon
                 current_weapon = weapons[min(5, weapon_roll - 1)]
                 print_important(f"Your weapon: {current_weapon}")
@@ -315,6 +348,10 @@ if not input_invalid:
                     print_important("Invalid input! Please enter a number between 0-3.")
                     num_dream_lvls = -1  # Reset to continue the loop
 
+            # FEATURE DEMONSTRATION: MONSTER COMBAT ABILITIES
+            print_header("MONSTER COMBAT ABILITIES FEATURE")
+            print_important("Starting combat to demonstrate monster abilities and adaptations!")
+            
             # Fight Sequence
             # Loop while the monster and the player are alive. Call fight sequence functions
             print_header("COMBAT BEGINS")
@@ -346,8 +383,7 @@ if not input_invalid:
                     if monster.health_points == 0:
                         score_gained = monster.get_score(hero.health_points)  # Calculate score based on player's health
                         game_score += score_gained  # Update total game score
-                        print_important(
-                            f"You defeated {monster.monster_type}! You earned {score_gained} points.")  # Display score
+                        print_important(f"You defeated {monster.monster_type}! You earned {score_gained} points.")  # Display score
                         num_stars = 3
                     else:
                         print_important("The monster strikes!")
@@ -357,6 +393,18 @@ if not input_invalid:
 
                         if hero.health_points == 0:
                             num_stars = 1
+                            print_important("You have been defeated by the monster!")
+                            # Check if score is high enough to continue
+                            if game_score > 30:
+                                # Reset hero's health to half of 30 for next encounters
+                                hero.health_points = 15  # 30/2 health
+                                print_important(f"Your score of {game_score} is high enough! You managed to escape and recover. Health restored to {hero.health_points}.")
+                            else:
+                                print_important(f"Your score of {game_score} is too low. You need more than 30 points to continue after defeat.")
+                                print("Game Over!")
+                                # Save the game with "Monster" as winner before exiting
+                                functions.save_game("Monster")
+                                break
                 else:
                     print_important("The Monster strikes first!")
                     print_game_text("Press enter to continue")
@@ -364,6 +412,18 @@ if not input_invalid:
                     functions.monster_attacks(monster, hero)
                     if hero.health_points == 0:
                         num_stars = 1
+                        print_important("You have been defeated by the monster!")
+                        # Check if score is high enough to continue
+                        if game_score > 30:
+                            # Reset hero's health to half of 30 for next encounters
+                            hero.health_points = 15  # 30/2 health
+                            print_important(f"Your score of {game_score} is high enough! You managed to escape and recover. Health restored to {hero.health_points}.")
+                        else:
+                            print_important(f"Your score of {game_score} is too low. You need more than 30 points to continue after defeat.")
+                            print("Game Over!")
+                            # Save the game with "Monster" as winner before exiting
+                            functions.save_game("Monster")
+                            break
                     else:
                         print_important("Now you can strike back!")
                         print_game_text("Press enter to attack")
@@ -377,44 +437,49 @@ if not input_invalid:
                         if weapon_usage[current_weapon] > 1 and hasattr(monster, 'adaptive') and monster.adaptive:
                             print_important(f"The {monster.monster_type} seems to be studying your {current_weapon} attacks...")
 
-                        functions.hero_attacks(hero, monster,belt)
+                        functions.hero_attacks(hero, monster, belt)
                         if monster.health_points == 0:
+                            score_gained = monster.get_score(hero.health_points)  # Calculate score based on player's health
+                            game_score += score_gained  # Update total game score
+                            print_important(f"You defeated {monster.monster_type}! You earned {score_gained} points.")  # Display score
                             num_stars = 3
 
             if(monster.health_points <= 0):
                 winner = "Hero"
-            else:
-                winner = "Monster"
-
-            # Final Score Display
-            print_header("GAME RESULTS")
-            tries = 0
-            input_invalid = True
-            while input_invalid and tries in range(5):
-                print_game_text("Enter your Hero's name (in two words)")
-                hero_name = input("    > ")
-                name = hero_name.split()
-                if len(name) != 2:
-                    print_important("Please enter a name with two parts (separated by a space)")
-                    tries += 1
-                else:
-                    if not name[0].isalpha() or not name[1].isalpha():
-                        print_important("Please enter an alphabetical name")
+                # Final Score Display
+                print_header("GAME RESULTS")
+                tries = 0
+                input_invalid = True
+                while input_invalid and tries in range(5):
+                    print_game_text("Enter your Hero's name (in two words)")
+                    hero_name = input("    > ")
+                    name = hero_name.split()
+                    if len(name) != 2:
+                        print_important("Please enter a name with two parts (separated by a space)")
                         tries += 1
                     else:
-                        short_name = name[0][0:2:1] + name[1][0:1:1]
-                        print_important(f"I'm going to call you {short_name} for short")
-                        input_invalid = False
+                        if not name[0].isalpha() or not name[1].isalpha():
+                            print_important("Please enter an alphabetical name")
+                            tries += 1
+                        else:
+                            short_name = name[0][0:2:1] + name[1][0:1:1]
+                            print_important(f"I'm going to call you {short_name} for short")
+                            input_invalid = False
 
-            if not input_invalid:
-                stars_display = "*" * num_stars
-                print_important(f"Hero {short_name} gets <{stars_display}> stars")
+                if not input_invalid:
+                    stars_display = "*" * num_stars
+                    print_important(f"Hero {short_name} gets <{stars_display}> stars")
 
-                # **Final Score Display**
-                print_header("FINAL SCORE")
-                print_important(f"Total Score: {game_score}")
+                    # **Final Score Display**
+                    print_header("FINAL SCORE")
+                    print_important(f"Total Score: {game_score}")
 
-                functions.save_game(winner, hero_name=short_name, num_stars=num_stars)
+                    functions.save_game(winner, hero_name=short_name, num_stars=num_stars)
+            else:
+                # If monster won (player died), just save the game without asking for name
+                winner = "Monster"
+                functions.save_game(winner)
+                # Score is already displayed when hero is revived, so no need to show it again
 
         elif hero.randEnc > 10:
             # Random encounter 5% chance to find a traveling merchant while roaming the map

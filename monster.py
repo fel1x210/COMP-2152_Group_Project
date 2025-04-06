@@ -59,3 +59,9 @@ class Monster(Character):
         attack_value = self.combat_strength
         print(f"The monster attacks with {attack_value} strength!")
         return attack_value
+        
+    def get_score(self, player_health):
+        """Calculate score based on monster's combat strength and player's health"""
+        base_score = max(5, self.combat_strength * 2)  # Base score based on monster strength
+        health_factor = max(1, 20 - player_health)  # Players with lower health get more points
+        return base_score * health_factor
