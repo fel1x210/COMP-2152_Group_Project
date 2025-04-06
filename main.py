@@ -365,7 +365,7 @@ if not input_invalid:
         print_important(f"Hero {short_name} gets <{stars_display}> stars")
 
         # Final Score Display
-        print_header("FINAL SCORE")
+        print_header("COMBAT SCORE")
         print_important(f"Total Score: {game_score}")
 
         functions.save_game(winner, hero_name=short_name, num_stars=num_stars)
