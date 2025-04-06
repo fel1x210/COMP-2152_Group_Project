@@ -1,4 +1,19 @@
+<<<<<<< HEAD
+Hero jot has killed a monster and gained 3 stars.
+=======
 Hero fel has killed a monster and gained 3 stars.
 Monster has killed the hero previously
 Hero fel has killed a monster and gained 3 stars.
 Hero Fel has killed a monster and gained 3 stars.
+>>>>>>> a3a66e411b9cdceca98f190b222ca8df3df40a9f
+Hero Fel has killed a monster and gained 3 stars.
+Hero fel has killed a monster and gained 3 stars.
+Hero FeL has killed a monster and gained 3 stars.
+Hero FeL has killed a monster and gained 3 stars.
+Hero feL has killed a monster and gained 3 stars.
+Hero FeL has killed a monster and gained 3 stars.
+Hero FeL has killed a monster and gained 3 stars.
+Monster has killed the hero previously
+Monster has killed the hero previously
+Monster has killed the hero previously
+Monster has killed the hero previously

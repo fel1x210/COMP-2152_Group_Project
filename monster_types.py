@@ -6,21 +6,28 @@ from functions import print_header, print_section, print_game_text, print_import
 class TypedMonster(Monster):
     def __init__(self, monster_type="Base"):
         super().__init__()
+        self.score = 1
         self.monster_type = monster_type
         self.strengths = []  # what weapons this monster type is strong against
         self.weaknesses = [] # what weapons this monster type is weak against
         self.environments = []  # environments where this monster gets bonuses
         self.adaptive = False  # whether monster adapts to attacks
         self.secondary_attributes = {}  # additional monster attributes
-        
+
         # Initialize secondary attributes at the end of initialization
         self._initialize_secondary_attributes()
-    
+
+    def get_score(self, player_health):
+        """Calculate score based on monster type and player's health"""
+        base_score = self.score  # Each monster type has a predefined score
+        health_factor = max(1, 20 - player_health)  # Players with lower health get more points
+        return base_score * health_factor
+
     def _initialize_secondary_attributes(self):
         """Initialize random secondary attributes"""
         # Base implementation - overridden by subclasses
         pass
-    
+
     # Method to apply type-based damage modifier
     def calculate_damage_modifier(self, weapon_type):
         # Apply weakness (take more damage)
@@ -31,13 +38,13 @@ class TypedMonster(Monster):
             return 0.5  # 50% less damage
         # No modifier
         return 1.0
-    
+
     def environment_bonus(self, environment):
         """Calculate environment-based bonus"""
         if environment in self.environments:
             return 2  # +2 to combat strength in favorable environment
         return 0
-    
+
     def adapt_to_attack(self, weapon_type):
         """Adapt to repeated attacks of the same type"""
         if self.adaptive and weapon_type in self.weaknesses:
@@ -46,12 +53,12 @@ class TypedMonster(Monster):
             print_important(f"The {self.monster_type} adapts to {weapon_type} attacks!")
             return True
         return False
-    
+
     def special_ability(self):
         """Use monster's special ability based on type"""
         # Base implementation returns combat value modifier
         return 0
-    
+
     def get_description(self):
         """Get a description of the monster"""
         desc = f"A {self.monster_type} with {self.combat_strength} combat strength and {self.health_points} health."
@@ -68,17 +75,19 @@ class TypedMonster(Monster):
 # Specific monster type implementations
 class ElementalMonster(TypedMonster):
     def __init__(self, element_type=None):
+        # game score value
+        self.score = 25
         # List of possible elemental types
         elements = ["Fire", "Water", "Earth", "Air"]
         # Select random element if none provided
         self.element = element_type if element_type else random.choice(elements)
-        
+
         # Call parent constructor with the proper monster type name
         super().__init__(f"{self.element} Elemental")
-        
+
         # Set adaptive behavior for elementals
         self.adaptive = random.choice([True, False])
-        
+
         # Define strengths and weaknesses based on element type
         if self.element == "Fire":
             self.strengths = ["Club", "Fist"]
@@ -96,10 +105,10 @@ class ElementalMonster(TypedMonster):
             self.strengths = ["Nuclear Bomb", "Fist"]
             self.weaknesses = ["Gun", "Knife"]
             self.environments = ["Mountain", "Plains"]
-            
+
         # Initialize secondary attributes after setting the element
         self._initialize_secondary_attributes()
-    
+
     def _initialize_secondary_attributes(self):
         """Initialize elemental-specific attributes"""
         if self.element == "Fire":
@@ -110,7 +119,7 @@ class ElementalMonster(TypedMonster):
             self.secondary_attributes["armor"] = random.randint(1, 3)
         elif self.element == "Air":
             self.secondary_attributes["evasion"] = random.randint(10, 30)
-    
+
     def special_ability(self):
         """Elemental special ability"""
         ability_power = 0
@@ -131,17 +140,19 @@ class ElementalMonster(TypedMonster):
 
 class UndeadMonster(TypedMonster):
     def __init__(self, undead_type=None):
+        # game score value
+        self.score = 20
         # List of possible undead types
         undead_types = ["Zombie", "Skeleton", "Ghost", "Vampire"]
         # Select random undead type if none provided
         self.undead_type = undead_type if undead_type else random.choice(undead_types)
-        
+
         # Call parent constructor
         super().__init__(f"{self.undead_type}")
-        
+
         # Set adaptive for some undead types
         self.adaptive = self.undead_type in ["Vampire", "Ghost"]
-        
+
         # Define strengths and weaknesses based on undead type
         if self.undead_type == "Zombie":
             self.strengths = ["Fist", "Knife"]
@@ -159,10 +170,10 @@ class UndeadMonster(TypedMonster):
             self.strengths = ["Gun", "Bomb"]
             self.weaknesses = ["Knife"]
             self.environments = ["Castle", "Cave"]
-            
+
         # Initialize secondary attributes
         self._initialize_secondary_attributes()
-    
+
     def _initialize_secondary_attributes(self):
         """Initialize undead-specific attributes"""
         if self.undead_type == "Zombie":
@@ -173,7 +184,7 @@ class UndeadMonster(TypedMonster):
             self.secondary_attributes["phase_chance"] = random.randint(20, 40)
         elif self.undead_type == "Vampire":
             self.secondary_attributes["life_drain"] = random.randint(1, 3)
-    
+
     def special_ability(self):
         """Undead special ability"""
         ability_power = 0
@@ -197,17 +208,19 @@ class UndeadMonster(TypedMonster):
 
 class MechanicalMonster(TypedMonster):
     def __init__(self, mech_type=None):
+        # game score value
+        self.score = 30
         # List of possible mechanical types
         mech_types = ["Robot", "Golem", "Automaton", "Drone"]
         # Select random mechanical type if none provided
         self.mech_type = mech_type if mech_type else random.choice(mech_types)
-        
+
         # Call parent constructor
         super().__init__(f"{self.mech_type}")
-        
+
         # Mechanical types are not adaptive by default
         self.adaptive = False
-        
+
         # Define strengths and weaknesses based on mechanical type
         if self.mech_type == "Robot":
             self.strengths = ["Fist", "Club"]
@@ -225,10 +238,10 @@ class MechanicalMonster(TypedMonster):
             self.strengths = ["Club", "Fist"]
             self.weaknesses = ["Gun", "Nuclear Bomb"]
             self.environments = ["Laboratory", "Plains"]
-            
+
         # Initialize secondary attributes
         self._initialize_secondary_attributes()
-    
+
     def _initialize_secondary_attributes(self):
         """Initialize mechanical-specific attributes"""
         if self.mech_type == "Robot":
@@ -239,7 +252,7 @@ class MechanicalMonster(TypedMonster):
             self.secondary_attributes["clockwork_precision"] = random.randint(1, 3)
         elif self.mech_type == "Drone":
             self.secondary_attributes["evasion"] = random.randint(20, 40)
-    
+
     def special_ability(self):
         """Mechanical special ability"""
         ability_power = 0
@@ -261,17 +274,19 @@ class MechanicalMonster(TypedMonster):
 # New Mythical monster type with unique abilities
 class MythicalMonster(TypedMonster):
     def __init__(self, mythical_type=None):
+        # game score value
+        self.score = 50
         # List of possible mythical types
         mythical_types = ["Dragon", "Phoenix", "Minotaur", "Hydra"]
         # Select random mythical type if none provided
         self.mythical_type = mythical_type if mythical_type else random.choice(mythical_types)
-        
+
         # Call parent constructor
         super().__init__(f"{self.mythical_type}")
-        
+
         # Mythical monsters are highly adaptive
         self.adaptive = True
-        
+
         # Define strengths and weaknesses based on mythical type
         if self.mythical_type == "Dragon":
             self.strengths = ["Knife", "Fist", "Club"]
@@ -289,10 +304,10 @@ class MythicalMonster(TypedMonster):
             self.strengths = ["Knife", "Fist"]
             self.weaknesses = ["Bomb", "Nuclear Bomb"]
             self.environments = ["Swamp", "Lake"]
-            
+
         # Initialize secondary attributes
         self._initialize_secondary_attributes()
-    
+
     def _initialize_secondary_attributes(self):
         """Initialize mythical-specific attributes"""
         if self.mythical_type == "Dragon":
@@ -303,7 +318,7 @@ class MythicalMonster(TypedMonster):
             self.secondary_attributes["charge_damage"] = random.randint(2, 4)
         elif self.mythical_type == "Hydra":
             self.secondary_attributes["multiple_heads"] = random.randint(2, 4)
-    
+
     def special_ability(self):
         """Mythical monster special ability"""
         ability_power = 0
@@ -327,7 +342,7 @@ class MythicalMonster(TypedMonster):
 def generate_monster_types(environment=None):
     # Define all possible monster categories
     monster_categories = ["Elemental", "Undead", "Mechanical", "Mythical"]
-    
+
     # Adjust probabilities based on environment
     if environment:
         # Create adjusted weights based on environment
@@ -337,10 +352,10 @@ def generate_monster_types(environment=None):
             3 if environment in ["Laboratory", "Factory", "Castle"] else 1,  # Mechanical
             1  # Mythical (always rare)
         ]
-        
+
         # Use weighted choice
         category = random.choices(monster_categories, weights=weights, k=1)[0]
-        
+
         # Use list comprehension with nested conditionals to create the appropriate monster
         monster = (
             ElementalMonster() if category == "Elemental"
@@ -349,24 +364,24 @@ def generate_monster_types(environment=None):
             else MythicalMonster() if category == "Mythical"
             else TypedMonster()
         )
-        
+
         # Apply environment bonus if applicable
         if environment in monster.environments:
             monster.combat_strength += 2
             print_game_text(f"The {monster.monster_type} is stronger in this {environment} environment!")
-        
+
         return monster
     else:
         # Use list comprehension to generate a list of possible monster types
         monster_types = [
-            ElementalMonster() if category == "Elemental" 
+            ElementalMonster() if category == "Elemental"
             else UndeadMonster() if category == "Undead"
             else MechanicalMonster() if category == "Mechanical"
             else MythicalMonster() if category == "Mythical"
-            else TypedMonster() 
+            else TypedMonster()
             for category in monster_categories
         ]
-        
+
         # Randomly select a monster type from the generated list
         return random.choice(monster_types)
 
@@ -377,8 +392,8 @@ def get_all_environments():
     undead_environments = ["Graveyard", "Dungeon", "Ruins", "Crypt", "Castle", "Mansion"]
     mechanical_environments = ["Laboratory", "Factory", "Castle"]
     mythical_environments = ["Mountain", "Cave", "Desert", "Labyrinth", "Swamp", "Lake"]
-    
+
     # Combine all environments and remove duplicates using set comprehension
     all_environments = list({env for envs in [elemental_environments, undead_environments, mechanical_environments, mythical_environments] for env in envs})
-    
-    return all_environments 
+
+    return all_environments
