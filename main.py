@@ -269,41 +269,44 @@ if not input_invalid:
             
             # Select a random environment for the battle
             combat_environment = functions.select_environment()
-
-            # Regenerate the monster based on the environment
-            monster = generate_monster_types(environment=combat_environment)
-            monster.combat_strength = monster_strength + min(6, monster_powers[power_roll])  # Apply original monster strength + power
-
-            # Display the new monster with emphasis on the environment connection
-            if hasattr(monster, 'monster_type'):
-                print_header("NEW MONSTER APPEARS")
-                if combat_environment in monster.environments:
-                    print_important(f"A {monster.monster_type} appears in the {combat_environment} environment - ITS NATURAL HABITAT!")
-                    print_game_text("This monster will be stronger here!")
-                else:
-                    print_important(f"A {monster.monster_type} appears in the {combat_environment} environment!")
+            
+            # Instead of generating a new monster, apply environment effects to the existing monster
+            print_header("ENVIRONMENT EFFECT ON MONSTER")
+            
+            # Check if the environment affects the monster
+            if hasattr(monster, 'environments') and combat_environment in monster.environments:
+                environment_bonus = monster.environment_bonus(combat_environment)
+                monster.combat_strength += environment_bonus
+                print_important(f"The {monster.monster_type} is in its natural habitat: {combat_environment}!")
+                print_game_text(f"It gains {environment_bonus} additional combat strength!")
+                print_important(f"Combat strength increased to {monster.combat_strength}!")
+            else:
+                print_important(f"The {monster.monster_type} is now in a {combat_environment} environment.")
+                if hasattr(monster, 'environments') and monster.environments:
                     print_game_text(f"This is not its natural habitat. It prefers: {', '.join(monster.environments)}")
-                print_game_text(f"{monster.get_description()}")
-
-            # Set random spell weakness and resistance for the new monster
-            monster.spell_weakness = random.choice(spells)
-            monster.spell_resistance = random.choice([spell for spell in spells if spell != monster.spell_weakness])
+                else:
+                    print_game_text("This monster has no environment preferences.")
+            
+            # Still show monster information for clarity
+            print_game_text(f"{monster.get_description()}")
+            
+            # Show monster's spell weaknesses and resistances again
+            print_section("Monster Spell Properties")
             print_important(f"Monster is WEAK against {monster.spell_weakness} spells")
             print_important(f"Monster is RESISTANT to {monster.spell_resistance} spells")
-
-            # Display monster type information
+            
+            # Show weapon effectiveness using list comprehension with nested conditionals
             if hasattr(monster, 'monster_type'):
-                # Show weapon effectiveness using list comprehension with nested conditionals
                 print_section("Weapon Effectiveness")
                 weapon_effectiveness = [
-                    f"{weapon} is " +
-                    ("EFFECTIVE against" if weapon in monster.weaknesses else
-                    "WEAK against" if weapon in monster.strengths else
-                    "NEUTRAL against") +
+                    f"{weapon} is " + 
+                    ("EFFECTIVE against" if weapon in monster.weaknesses else 
+                     "WEAK against" if weapon in monster.strengths else 
+                     "NEUTRAL against") + 
                     f" this monster!"
                     for weapon in weapons
                 ]
-
+                
                 # Print the effectiveness information for the player's weapon
                 current_weapon = weapons[min(5, weapon_roll - 1)]
                 print_important(f"Your weapon: {current_weapon}")
