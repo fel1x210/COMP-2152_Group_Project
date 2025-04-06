@@ -20,7 +20,7 @@ class Hero(Character):
         if self.combat_strength >= m_health_points:
             m_health_points = 0
             print("    |    You have killed the monster")
-
+            
         else:
             m_health_points -= self.combat_strength
             print("    |    You have reduced the monster's health to: " + str(m_health_points))

@@ -294,15 +294,10 @@ if not input_invalid:
             # Show adaptation message if weapon has been used multiple times
             if weapon_usage[current_weapon] > 1 and hasattr(monster, 'adaptive') and monster.adaptive:
                 print_important(f"The {monster.monster_type} seems to be studying your {current_weapon} attacks...")
-
+            
             functions.hero_attacks(hero, monster)
             if monster.health_points == 0:
-                score_gained = monster.get_score(hero.health_points)  # Calculate score based on player's health
-                game_score += score_gained  # Update total game score
-                print_important(
-                    f"You defeated {monster.monster_type}! You earned {score_gained} points.")  # Display score
                 num_stars = 3
-
             else:
                 print_important("The monster strikes!")
                 print_game_text("Press enter to continue")
@@ -363,10 +358,6 @@ if not input_invalid:
     if not input_invalid:
         stars_display = "*" * num_stars
         print_important(f"Hero {short_name} gets <{stars_display}> stars")
-
-        # Final Score Display
-        print_header("FINAL SCORE")
-        print_important(f"Total Score: {game_score}")
 
         functions.save_game(winner, hero_name=short_name, num_stars=num_stars)
 
